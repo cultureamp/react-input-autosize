@@ -1871,7 +1871,15 @@ var React = require('react');
 var PropTypes = require('prop-types');
 var createReactClass = require('create-react-class');
 
-var sizerStyle = { position: 'absolute', top: 0, left: 0, visibility: 'hidden', height: 0, overflow: 'scroll', whiteSpace: 'pre' };
+var sizerStyle = {
+	position: 'absolute',
+	top: 0,
+	left: 0,
+	visibility: 'hidden',
+	height: 0,
+	overflow: 'scroll',
+	whiteSpace: 'pre'
+};
 
 var AutosizeInput = createReactClass({
 	propTypes: {
@@ -1879,7 +1887,8 @@ var AutosizeInput = createReactClass({
 		defaultValue: PropTypes.any, // default field value
 		inputClassName: PropTypes.string, // className for the input element
 		inputStyle: PropTypes.object, // css styles for the input element
-		minWidth: PropTypes.oneOfType([// minimum width for input element
+		minWidth: PropTypes.oneOfType([
+		// minimum width for input element
 		PropTypes.number, PropTypes.string]),
 		onChange: PropTypes.func, // onChange handler: function(newValue) {}
 		placeholder: PropTypes.string, // placeholder text
@@ -1898,14 +1907,18 @@ var AutosizeInput = createReactClass({
 		};
 	},
 	componentDidMount: function componentDidMount() {
+		this.isMounted = true;
 		this.copyInputStyles();
 		this.updateInputWidth();
 	},
 	componentDidUpdate: function componentDidUpdate() {
 		this.updateInputWidth();
 	},
+	componentWillUnmount: function componentWillUnmount() {
+		this.isMounted = false;
+	},
 	copyInputStyles: function copyInputStyles() {
-		if (!this.isMounted() || !window.getComputedStyle) {
+		if (!this.isMounted || !window.getComputedStyle) {
 			return;
 		}
 		var inputStyle = window.getComputedStyle(this.refs.input);
@@ -1928,7 +1941,7 @@ var AutosizeInput = createReactClass({
 		}
 	},
 	updateInputWidth: function updateInputWidth() {
-		if (!this.isMounted() || typeof this.refs.sizer.scrollWidth === 'undefined') {
+		if (!this.isMounted || typeof this.refs.sizer.scrollWidth === 'undefined') {
 			return;
 		}
 		var newInputWidth = undefined;

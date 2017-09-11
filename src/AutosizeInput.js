@@ -2,23 +2,32 @@ const React = require('react');
 const PropTypes = require('prop-types');
 const createReactClass = require('create-react-class');
 
-const sizerStyle = { position: 'absolute', top: 0, left: 0, visibility: 'hidden', height: 0, overflow: 'scroll', whiteSpace: 'pre' };
+const sizerStyle = {
+	position: 'absolute',
+	top: 0,
+	left: 0,
+	visibility: 'hidden',
+	height: 0,
+	overflow: 'scroll',
+	whiteSpace: 'pre',
+};
 
 const AutosizeInput = createReactClass({
 	propTypes: {
-		className: PropTypes.string,               // className for the outer element
-		defaultValue: PropTypes.any,               // default field value
-		inputClassName: PropTypes.string,          // className for the input element
-		inputStyle: PropTypes.object,              // css styles for the input element
-		minWidth: PropTypes.oneOfType([            // minimum width for input element
+		className: PropTypes.string, // className for the outer element
+		defaultValue: PropTypes.any, // default field value
+		inputClassName: PropTypes.string, // className for the input element
+		inputStyle: PropTypes.object, // css styles for the input element
+		minWidth: PropTypes.oneOfType([
+			// minimum width for input element
 			PropTypes.number,
 			PropTypes.string,
 		]),
-		onChange: PropTypes.func,                  // onChange handler: function(newValue) {}
-		placeholder: PropTypes.string,             // placeholder text
-		placeholderIsMinWidth: PropTypes.bool,     // don't collapse size to less than the placeholder
-		style: PropTypes.object,                   // css styles for the outer element
-		value: PropTypes.any,                      // field value
+		onChange: PropTypes.func, // onChange handler: function(newValue) {}
+		placeholder: PropTypes.string, // placeholder text
+		placeholderIsMinWidth: PropTypes.bool, // don't collapse size to less than the placeholder
+		style: PropTypes.object, // css styles for the outer element
+		value: PropTypes.any, // field value
 	},
 	getDefaultProps () {
 		return {
@@ -31,14 +40,18 @@ const AutosizeInput = createReactClass({
 		};
 	},
 	componentDidMount () {
+		this.isMounted = true;
 		this.copyInputStyles();
 		this.updateInputWidth();
 	},
 	componentDidUpdate () {
 		this.updateInputWidth();
 	},
+	componentWillUnmount () {
+		this.isMounted = false;
+	},
 	copyInputStyles () {
-		if (!this.isMounted() || !window.getComputedStyle) {
+		if (!this.isMounted || !window.getComputedStyle) {
 			return;
 		}
 		const inputStyle = window.getComputedStyle(this.refs.input);
@@ -61,12 +74,23 @@ const AutosizeInput = createReactClass({
 		}
 	},
 	updateInputWidth () {
-		if (!this.isMounted() || typeof this.refs.sizer.scrollWidth === 'undefined') {
+		if (
+			!this.isMounted ||
+			typeof this.refs.sizer.scrollWidth === 'undefined'
+		) {
 			return;
 		}
 		let newInputWidth;
-		if (this.props.placeholder && (!this.props.value || (this.props.value && this.props.placeholderIsMinWidth))) {
-			newInputWidth = Math.max(this.refs.sizer.scrollWidth, this.refs.placeholderSizer.scrollWidth) + 2;
+		if (
+			this.props.placeholder &&
+			(!this.props.value ||
+				(this.props.value && this.props.placeholderIsMinWidth))
+		) {
+			newInputWidth =
+				Math.max(
+					this.refs.sizer.scrollWidth,
+					this.refs.placeholderSizer.scrollWidth
+				) + 2;
 		} else {
 			newInputWidth = this.refs.sizer.scrollWidth + 2;
 		}
@@ -92,7 +116,7 @@ const AutosizeInput = createReactClass({
 		this.refs.input.select();
 	},
 	render () {
-		const sizerValue = (this.props.defaultValue || this.props.value || '');
+		const sizerValue = this.props.defaultValue || this.props.value || '';
 		const wrapperStyle = this.props.style || {};
 		if (!wrapperStyle.display) wrapperStyle.display = 'inline-block';
 		const inputStyle = Object.assign({}, this.props.inputStyle);
@@ -109,8 +133,14 @@ const AutosizeInput = createReactClass({
 		return (
 			<div className={this.props.className} style={wrapperStyle}>
 				<input {...inputProps} ref="input" />
-				<div ref="sizer" style={sizerStyle}>{sizerValue}</div>
-				{this.props.placeholder ? <div ref="placeholderSizer" style={sizerStyle}>{this.props.placeholder}</div> : null}
+				<div ref="sizer" style={sizerStyle}>
+					{sizerValue}
+				</div>
+				{this.props.placeholder ? (
+					<div ref="placeholderSizer" style={sizerStyle}>
+						{this.props.placeholder}
+					</div>
+				) : null}
 			</div>
 		);
 	},
